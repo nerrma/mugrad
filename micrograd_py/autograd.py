@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 from graphviz import Digraph
+import math
 
 
 class Value:
@@ -14,7 +15,7 @@ class Value:
         self.topo = []
 
     def __repr__(self):
-        return f"value {self.label}: {self.data}, grad {self.grad}"
+        return f"Value(label={self.label}, data={self.data}, grad={self.grad})"
 
     def __add__(self, other):
         other = other if isinstance(other, Value) else Value(other, label=str(other))
@@ -22,7 +23,6 @@ class Value:
             self.data + other.data,
             children=(self, other),
             op="+",
-            label=f"{self.label}+{other.label}",
         )
 
         def __backward():
@@ -35,13 +35,18 @@ class Value:
     def __radd__(self, other):
         return self + other
 
+    def __neg__(self):
+        return self * -1
+
+    def __sub__(self, other):
+        return self + -other
+
     def __mul__(self, other):
         other = other if isinstance(other, Value) else Value(other, label=str(other))
         result = Value(
             self.data * other.data,
             children=(self, other),
             op="*",
-            label=f"{self.label}*{other.label}",
         )
 
         def __backward():
@@ -55,21 +60,69 @@ class Value:
     def __rmul__(self, other):
         return self * other
 
+    def __truediv__(self, other):
+        return self * (other**-1)
+
+    def __pow__(self, other):
+        assert isinstance(other, (int, float))
+        result = Value(self.data**other, children=(self,))
+
+        def __backward():
+            self.grad += other * (self.data ** (other - 1)) * result.grad
+
+        result._backward = __backward
+        return result
+
+    def exp(self):
+        result = Value(
+            math.exp(self.data),
+            children=(self.data,),
+            op="exp",
+        )
+
+        def __backward():
+            self.grad += result.data * result.grad
+
+        result._backward = __backward
+        return result
+
     def gen_topo(self):
         # construct topo sorted graph
         # as the graph is fully connected we do not need to call dfs for each vertex
         seen = set()
         topo = []
 
-        def dfs(v):
+        def dfs(v, p):
             for u in v.children:
                 if u not in seen:
                     seen.add(u)
-                    dfs(u)
+                    dfs(u, v)
             topo.append(v)
 
-        dfs(self)
+        dfs(self, Value(0.0, label="blank"))
         return topo[::-1]
+
+    def relu(self):
+        result = Value(
+            0.0 if self.data < 0.0 else self.data, children=(self,), label="ReLU"
+        )
+
+        def __backward():
+            self.grad += (result.data > 0.0) * result.grad
+
+        result._backward = __backward
+        return result
+
+    def tanh(self):
+        x = self.data
+        t = (math.exp(2 * x) - 1) / (math.exp(2 * x) + 1)
+        out = Value(t, children=(self,), label="tanh")
+
+        def _backward():
+            self.grad += (1 - t**2) * out.grad
+
+        out._backward = _backward
+        return out
 
     def backward(self):
         # call backward on all children
