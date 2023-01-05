@@ -1,45 +1,31 @@
 #!/usr/bin/env python3
 
-# import autograd as ag
-#
-# a = ag.Value(1.0, "a")
-# b = ag.Value(2.0, "b")
-#
-# print(a + b)
-# print(a * b)
-#
-# m = ag.Value(3.0, "m")
-# d = a * m + b
-# d.backward()
-#
-# print(d)
-# print(a)
-# print(b)
-
-import autograd as ag
 from nn import MLP
+import random
 import numpy as np
 
-# lin-reg
-xs = [[1], [2], [3], [4]]
-# y = [1, 2, 3, 4]
-y = [1, 4, 9, 16]
+random.seed(18)
+np.random.seed(18)
 
-# xor
-# xs = [[1, 1], [-1, -1], [1, -1], [-1, 1]]
-# y = [0, 0, 1, 1]
-clf = MLP(dims=[(1, 4), (4, 4), (4, 4), (4, 1)])
+x = np.array(np.arange(0, 6))
+y = [e**2 for e in x]
+xs = x.reshape(-1, 1)
 
-nit = 900
-eta = 0.001
+clf = MLP([(1, 16), (16, 32), (32, 16), (16, 1)], activation="tanh")
+
+nit = 400
+eta = 0.01
 y_hat = None
 for i in range(nit):
-    y_hat = [clf.forward(x) for x in xs]
-    loss = sum((y_h - y_t) ** 2 for y_h, y_t in zip(y_hat, y))
+    y_hat = [clf(x) for x in xs]
+    loss = sum((y_h - y_t) ** 2 for y_h, y_t in zip(y_hat, y)) / len(x)
     clf.zero_grad()
     loss.backward()
 
-    for p in clf.params():
+    if i % 10 == 0:
+        print(f"iter {i}: loss {loss.data}")
+
+    for p in clf.parameters():
         p.data -= eta * p.grad
 
 
