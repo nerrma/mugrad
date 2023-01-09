@@ -69,6 +69,10 @@ class MLP:
     def parameters(self):
         return [p for l in self.layers for p in l.parameters()]
 
+    def set_params(self, p_list):
+        for p, d in zip(self.parameters(), p_list):
+            p = d
+
     def zero_grad(self):
         for p in self.parameters():
             p.grad = 0
