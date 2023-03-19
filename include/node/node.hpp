@@ -2,6 +2,7 @@
 #define NODE_H_
 
 #include <algorithm>
+#include <iostream>
 #include <memory>
 #include <set>
 #include <string>
@@ -31,6 +32,7 @@ public:
   [[nodiscard]] auto get_grad() const -> double { return grad_; }
   auto add_grad(double const &addend) -> void { this->grad_ += addend; }
   auto set_grad(double const &val) -> void { this->grad_ = val; }
+  auto set_ptr(std::shared_ptr<Node> const &ptr) -> void { this->ptr_ = ptr; }
   auto zero_grad() -> void { this->grad_ = 0; }
 
   virtual void backward(){};
@@ -41,12 +43,15 @@ public:
 
   [[nodiscard]] auto get_label() -> std::string { return label_; }
 
-  [[nodiscard]] auto gen_topo(std::shared_ptr<Node> const &ptr)
-      -> std::vector<std::shared_ptr<Node>> {
+  [[nodiscard]] auto gen_topo() -> std::vector<std::shared_ptr<Node>> {
+    if (this->ptr_ == nullptr) {
+      return {};
+    }
+
     std::vector<std::shared_ptr<Node>> res;
     std::set<std::shared_ptr<Node>> seen;
 
-    dfs(ptr, res, seen);
+    dfs(this->ptr_, res, seen);
     std::reverse(res.begin(), res.end());
     return res;
   }
@@ -75,9 +80,9 @@ private:
   double data_;
   double grad_;
   std::string label_;
-  // std::vector<std::shared_ptr<Node>> children_;
   std::shared_ptr<Node> l_;
   std::shared_ptr<Node> r_;
+  std::shared_ptr<Node> ptr_;
 };
 
 } // namespace mugrad

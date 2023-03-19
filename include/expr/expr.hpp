@@ -24,6 +24,16 @@ public:
     this->get_r()->add_grad(this->get_l()->get_data() * this->get_grad());
   }
 };
+
+auto backward(std::shared_ptr<Node> &head) -> void {
+  auto topo = head->gen_topo();
+
+  head->set_grad(1);
+
+  for (auto const &c : topo)
+    c->backward();
+}
+
 } // namespace mugrad
 
 #endif // EXPR_H_

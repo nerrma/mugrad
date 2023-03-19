@@ -19,15 +19,21 @@ public:
 auto operator+(std::shared_ptr<Node> const &a, std::shared_ptr<Node> const &b)
     -> std::shared_ptr<Node> {
   AddExpr result(a->get_data() + b->get_data(), "+", a, b);
+  auto ptr = std::make_shared<AddExpr>(result);
 
-  return std::make_shared<AddExpr>(result);
+  ptr->set_ptr(ptr);
+
+  return ptr;
 }
 
 auto operator*(std::shared_ptr<Node> const &a, std::shared_ptr<Node> const &b)
     -> std::shared_ptr<Node> {
   MulExpr result(a->get_data() * b->get_data(), "*", a, b);
+  auto ptr = std::make_shared<MulExpr>(result);
 
-  return std::make_shared<MulExpr>(result);
+  ptr->set_ptr(ptr);
+
+  return ptr;
 }
 
 } // namespace mugrad
