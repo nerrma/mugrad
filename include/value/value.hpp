@@ -13,22 +13,23 @@ class Value : public mugrad::Node {
   using Node::Node;
 
 public:
-  auto operator+(Node &o) -> AddExpr {
-    AddExpr result(o.get_data() + this->get_data(), "+",
-                   {std::make_shared<Node>(this), std::make_shared<Node>(o)});
-
-    return AddExpr();
-  }
-
-  auto operator*(Node &o) -> MulExpr {
-    MulExpr result(o.get_data() * this->get_data(), "+",
-                   {std::make_shared<Node>(this), std::make_shared<Node>(o)});
-
-    return MulExpr();
-  }
-
-  virtual void backward() { return; }
+  void backward() override { return; }
 };
+
+auto operator+(std::shared_ptr<Node> const &a, std::shared_ptr<Node> const &b)
+    -> std::shared_ptr<Node> {
+  AddExpr result(a->get_data() + b->get_data(), "+", a, b);
+
+  return std::make_shared<AddExpr>(result);
+}
+
+auto operator*(std::shared_ptr<Node> const &a, std::shared_ptr<Node> const &b)
+    -> std::shared_ptr<Node> {
+  MulExpr result(a->get_data() * b->get_data(), "*", a, b);
+
+  return std::make_shared<MulExpr>(result);
+}
+
 } // namespace mugrad
 
 #endif // VALUE_H_
