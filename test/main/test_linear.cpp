@@ -73,3 +73,31 @@ TEST_CASE("layered backward") {
   mugrad::backward(res2);
   CHECK(v2->get_grad() == 30.0);
 }
+
+TEST_CASE("test exponentiation (square)") {
+  auto v1 = std::make_shared<mugrad::Node>(mugrad::Value(3.0, "v1"));
+
+  auto res = mugrad::Exp<2>(v1);
+  CHECK(res->get_data() == 9.0);
+
+  mugrad::backward(res);
+  /*
+    f = v1^2
+    df = 2 * v1
+   */
+  CHECK(v1->get_grad() == 6.0);
+}
+
+TEST_CASE("test exponentiation (cube)") {
+  auto v1 = std::make_shared<mugrad::Node>(mugrad::Value(5.0, "v1"));
+
+  auto res = mugrad::Exp<3>(v1);
+  CHECK(res->get_data() == 125.0);
+
+  mugrad::backward(res);
+  /*
+    f = v1^3
+    df = 3 * v1^2
+   */
+  CHECK(v1->get_grad() == 75.0);
+}
