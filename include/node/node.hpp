@@ -33,9 +33,23 @@ public:
   auto add_grad(double const &addend) -> void { this->grad_ += addend; }
   auto set_grad(double const &val) -> void { this->grad_ = val; }
   auto set_ptr(std::shared_ptr<Node> const &ptr) -> void { this->ptr_ = ptr; }
-  auto zero_grad() -> void { this->grad_ = 0; }
+  auto zero_grad() -> void {
+    this->grad_ = 0;
+    if (l_)
+      l_->zero_grad();
 
-  virtual void backward(){};
+    if (r_)
+      r_->zero_grad();
+  }
+
+  virtual void backward() {}
+  virtual void update() {
+    if (l_)
+      l_->update();
+
+    if (r_)
+      r_->update();
+  }
 
   [[nodiscard]] auto get_l() -> std::shared_ptr<Node> { return l_; }
 
