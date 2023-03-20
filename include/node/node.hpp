@@ -19,6 +19,8 @@ public:
   Node() = default;
   virtual ~Node() = default;
 
+  Node(double data) : data_{data}, label_{}, l_{}, r_{} {}
+
   Node(double data, std::string label)
       : data_{data}, label_{label}, l_{}, r_{} {}
 
@@ -35,19 +37,19 @@ public:
   auto set_ptr(std::shared_ptr<Node> const &ptr) -> void { this->ptr_ = ptr; }
   auto zero_grad() -> void {
     this->grad_ = 0;
-    if (l_)
+    if (l_ != nullptr)
       l_->zero_grad();
 
-    if (r_)
+    if (r_ != nullptr)
       r_->zero_grad();
   }
 
   virtual void backward() {}
   virtual void update() {
-    if (l_)
+    if (l_ != nullptr)
       l_->update();
 
-    if (r_)
+    if (r_ != nullptr)
       r_->update();
   }
 

@@ -27,7 +27,7 @@ class SubExpr : public mugrad::Node {
 public:
   void backward() override {
     this->get_l()->add_grad(this->get_grad());
-    this->get_r()->add_grad(this->get_grad());
+    this->get_r()->add_grad(-this->get_grad());
   }
 
   void update() override {
