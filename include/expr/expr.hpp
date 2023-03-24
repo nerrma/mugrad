@@ -1,5 +1,4 @@
-#ifndef EXPR_H_
-#define EXPR_H_
+#pragma once
 
 #include "node/node.hpp"
 #include <cmath>
@@ -17,7 +16,7 @@ public:
   }
 
   void update() override {
-    this->set_data(this->get_l()->get_data() + this->get_r()->get_data());
+    this->data = (this->get_l()->data + this->get_r()->data);
   }
 };
 
@@ -31,7 +30,7 @@ public:
   }
 
   void update() override {
-    this->set_data(this->get_l()->get_data() - this->get_r()->get_data());
+    this->data = (this->get_l()->data - this->get_r()->data);
   }
 };
 
@@ -40,12 +39,12 @@ class MulExpr : public mugrad::Node {
 
 public:
   void backward() override {
-    this->get_l()->add_grad(this->get_r()->get_data() * this->get_grad());
-    this->get_r()->add_grad(this->get_l()->get_data() * this->get_grad());
+    this->get_l()->add_grad(this->get_r()->data * this->get_grad());
+    this->get_r()->add_grad(this->get_l()->data * this->get_grad());
   }
 
   void update() override {
-    this->set_data(this->get_l()->get_data() * this->get_r()->get_data());
+    this->data = (this->get_l()->data * this->get_r()->data);
   }
 };
 
@@ -54,13 +53,11 @@ template <unsigned int N> class ExpExpr : public mugrad::Node {
 
 public:
   void backward() override {
-    this->get_l()->add_grad(N * std::pow(this->get_l()->get_data(), N - 1) *
+    this->get_l()->add_grad(N * std::pow(this->get_l()->data, N - 1) *
                             this->get_grad());
   }
 
-  void update() override {
-    this->set_data(std::pow(this->get_l()->get_data(), N));
-  }
+  void update() override { this->data = (std::pow(this->get_l()->data, N)); }
 };
 
 auto backward(std::shared_ptr<Node> &head) -> void {
@@ -73,5 +70,3 @@ auto backward(std::shared_ptr<Node> &head) -> void {
 }
 
 } // namespace mugrad
-
-#endif // EXPR_H_

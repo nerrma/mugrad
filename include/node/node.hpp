@@ -1,5 +1,4 @@
-#ifndef NODE_H_
-#define NODE_H_
+#pragma once
 
 #include <algorithm>
 #include <iostream>
@@ -19,21 +18,20 @@ public:
   Node() = default;
   virtual ~Node() = default;
 
-  Node(double data) : data_{data}, label_{}, l_{}, r_{} {}
+  Node(double data) : data{data}, label_{}, l_{}, r_{} {}
 
   Node(double data, std::string label)
-      : data_{data}, label_{label}, l_{}, r_{} {}
+      : data{data}, label_{label}, l_{}, r_{} {}
 
   Node(double data, std::string label, std::shared_ptr<Node> l,
        std::shared_ptr<Node> r)
-      : data_{data}, label_{label}, l_{l}, r_{r} {}
+      : data{data}, label_{label}, l_{l}, r_{r} {}
 
-  [[nodiscard]] auto get_data() const -> double { return data_; }
-  auto set_data(double const &d) -> void { data_ = d; }
+  double data;
 
+  auto set_grad(const double &grad) -> void { grad_ = grad; }
   [[nodiscard]] auto get_grad() const -> double { return grad_; }
   auto add_grad(double const &addend) -> void { this->grad_ += addend; }
-  auto set_grad(double const &val) -> void { this->grad_ = val; }
   auto set_ptr(std::shared_ptr<Node> const &ptr) -> void { this->ptr_ = ptr; }
   auto zero_grad() -> void {
     this->grad_ = 0;
@@ -93,7 +91,6 @@ private:
     topo.push_back(node);
   }
 
-  double data_;
   double grad_;
   std::string label_;
   std::shared_ptr<Node> l_;
@@ -102,5 +99,3 @@ private:
 };
 
 } // namespace mugrad
-
-#endif // NODE_H_
