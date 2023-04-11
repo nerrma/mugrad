@@ -71,6 +71,18 @@ public:
         return result;
     }
 
+    auto transpose() const -> Tensor
+    {
+        auto result = Tensor({ dims_.second, dims_.first });
+        for (int i = 0; i < dims_.first; i++) {
+            for (int j = 0; j < dims_.second; j++) {
+                result[j][i] = vals_[i][j];
+            }
+        }
+
+        return result;
+    }
+
 private:
     std::vector<std::vector<T>> vals_;
     std::pair<int, int> dims_;

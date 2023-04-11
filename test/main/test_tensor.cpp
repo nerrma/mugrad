@@ -29,3 +29,13 @@ TEST_CASE("basic mul test")
     CHECK(v3[0] == std::vector<double> { 140, 146 });
     CHECK(v3[1] == std::vector<double> { 320, 335 });
 }
+
+TEST_CASE("basic transpose test")
+{
+    auto v1 = mugrad::Tensor<double>({ { 1, 2, 3 }, { 4, 5, 6 } });
+
+    auto v2 = v1.transpose();
+    CHECK(v2[0] == std::vector<double> { { 1, 4 } });
+    CHECK(v2[1] == std::vector<double> { { 2, 5 } });
+    CHECK(v2[2] == std::vector<double> { { 3, 6 } });
+}
