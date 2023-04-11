@@ -14,8 +14,6 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/config/cmake")
 enable_testing()
 include(CTest)
 
-#include(add-targets)
-
 include_directories(include)
 
 add_subdirectory(source)

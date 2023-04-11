@@ -16,87 +16,94 @@
 namespace mugrad {
 
 // Pointer operators
-auto operator+(std::shared_ptr<Node> const &a, std::shared_ptr<Node> const &b)
-    -> std::shared_ptr<Node> {
-  AddExpr result(a->data + b->data, "+", a, b);
-  auto ptr = std::make_shared<AddExpr>(result);
+template<typename T>
+auto operator+(std::shared_ptr<Node<T>> const& a, std::shared_ptr<Node<T>> const& b)
+    -> std::shared_ptr<Node<T>>
+{
+    AddExpr<T> result(a->data + b->data, "+", a, b);
+    auto ptr = std::make_shared<AddExpr<T>>(result);
 
-  ptr->set_ptr(ptr);
+    ptr->set_ptr(ptr);
 
-  return ptr;
+    return ptr;
 }
 
-auto operator-(std::shared_ptr<Node> const &a, std::shared_ptr<Node> const &b)
-    -> std::shared_ptr<Node> {
-  SubExpr result(a->data - b->data, "+", a, b);
-  auto ptr = std::make_shared<SubExpr>(result);
+template<typename T>
+auto operator-(std::shared_ptr<Node<T>> const& a, std::shared_ptr<Node<T>> const& b)
+    -> std::shared_ptr<Node<T>>
+{
+    SubExpr<T> result(a->data - b->data, "+", a, b);
+    auto ptr = std::make_shared<SubExpr<T>>(result);
 
-  ptr->set_ptr(ptr);
+    ptr->set_ptr(ptr);
 
-  return ptr;
+    return ptr;
 }
 
-auto operator*(std::shared_ptr<Node> const &a, std::shared_ptr<Node> const &b)
-    -> std::shared_ptr<Node> {
-  MulExpr result(a->data * b->data, "*", a, b);
-  auto ptr = std::make_shared<MulExpr>(result);
+template<typename T>
+auto operator*(std::shared_ptr<Node<T>> const& a, std::shared_ptr<Node<T>> const& b)
+    -> std::shared_ptr<Node<T>>
+{
+    MulExpr<T> result(a->data * b->data, "*", a, b);
+    auto ptr = std::make_shared<MulExpr<T>>(result);
 
-  ptr->set_ptr(ptr);
+    ptr->set_ptr(ptr);
 
-  return ptr;
+    return ptr;
 }
 
 // Constant type operators
-template <typename T>
-auto operator*(T const &a, std::shared_ptr<Node> const &b)
-    -> std::shared_ptr<Node>
-  requires std::integral<T> || std::floating_point<T>
+template<typename T, typename T2>
+auto operator*(T const& a, std::shared_ptr<Node<T2>> const& b)
+    -> std::shared_ptr<Node<T>>
+requires std::integral<T> || std::floating_point<T>
 {
-  auto av = std::make_shared<Value>(Value(a));
-  MulExpr result(av->data * b->data, "*", av, b);
-  auto ptr = std::make_shared<MulExpr>(result);
+    auto av = std::make_shared<Value>(Value(a));
+    MulExpr<T> result(av->data * b->data, "*", av, b);
+    auto ptr = std::make_shared<MulExpr<T>>(result);
 
-  ptr->set_ptr(ptr);
+    ptr->set_ptr(ptr);
 
-  return ptr;
+    return ptr;
 }
 
-template <typename T>
-auto operator+(T const &a, std::shared_ptr<Node> const &b)
-    -> std::shared_ptr<Node>
-  requires std::integral<T> || std::floating_point<T>
+template<typename T>
+auto operator+(T const& a, std::shared_ptr<Node<T>> const& b)
+    -> std::shared_ptr<Node<T>>
+requires std::integral<T> || std::floating_point<T>
 {
-  auto av = std::make_shared<Value>(Value(a));
-  AddExpr result(av->data + b->data, "*", av, b);
-  auto ptr = std::make_shared<AddExpr>(result);
+    auto av = std::make_shared<Value>(Value(a));
+    AddExpr result(av->data + b->data, "*", av, b);
+    auto ptr = std::make_shared<AddExpr>(result);
 
-  ptr->set_ptr(ptr);
+    ptr->set_ptr(ptr);
 
-  return ptr;
+    return ptr;
 }
 
-template <typename T>
-auto operator-(T const &a, std::shared_ptr<Node> const &b)
-    -> std::shared_ptr<Node>
-  requires std::integral<T> || std::floating_point<T>
+template<typename T>
+auto operator-(T const& a, std::shared_ptr<Node<T>> const& b)
+    -> std::shared_ptr<Node<T>>
+requires std::integral<T> || std::floating_point<T>
 {
-  auto av = std::make_shared<Value>(Value(a));
-  SubExpr result(a - b->data, "*", av, b);
-  auto ptr = std::make_shared<SubExpr>(result);
+    auto av = std::make_shared<Value>(Value(a));
+    SubExpr<T> result(a - b->data, "*", av, b);
+    auto ptr = std::make_shared<SubExpr<T>>(result);
 
-  ptr->set_ptr(ptr);
+    ptr->set_ptr(ptr);
 
-  return ptr;
+    return ptr;
 }
 
-template <unsigned int N>
-auto Exp(std::shared_ptr<Node> const &a) -> std::shared_ptr<Node> {
-  ExpExpr<N> result(std::pow(a->data, N), "*", a, nullptr);
-  auto ptr = std::make_shared<ExpExpr<N>>(result);
+template<typename T>
+auto Exp(std::shared_ptr<Node<T>> const& a, unsigned int N) -> std::shared_ptr<Node<T>>
+{
+    ExpExpr<T> result(std::pow(a->data, N), "*", a, nullptr, N);
+    auto ptr = std::make_shared<ExpExpr<T>>(result);
 
-  ptr->set_ptr(ptr);
+    ptr->set_ptr(ptr);
 
-  return ptr;
+    return ptr;
 }
 
 } // namespace mugrad

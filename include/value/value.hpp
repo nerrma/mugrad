@@ -4,10 +4,10 @@
 #include "node/node.hpp"
 
 namespace mugrad {
-class Value : public mugrad::Node {
-  using Node::Node;
+class Value : public mugrad::Node<double> {
+    using Node::Node;
 
 public:
-  void backward() override { return; }
+    void backward() override { return; }
 };
 } // namespace mugrad
