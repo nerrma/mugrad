@@ -1,6 +1,7 @@
 #pragma once
 
 #include "node/node.hpp"
+#include "tensor/tensor.hpp"
 #include <cmath>
 #include <iostream>
 #include <memory>
@@ -8,21 +9,18 @@
 namespace mugrad {
 
 // all expressions
-template<typename T>
-class AddExpr { };
+// template<typename T>
+// class SubExpr { };
+//
+// template<typename T>
+// class MulExpr { };
+//
+// template<typename T>
+// class ExpExpr { };
 
 template<typename T>
-class SubExpr { };
-
-template<typename T>
-class MulExpr { };
-
-template<typename T>
-class ExpExpr { };
-
-template<>
-class AddExpr<double> : public mugrad::Node<double> {
-    using Node::Node;
+class AddExpr : public mugrad::Node<T> {
+    using Node<T>::Node;
 
 public:
     void backward() override
@@ -37,9 +35,9 @@ public:
     }
 };
 
-template<>
-class SubExpr<double> : public mugrad::Node<double> {
-    using Node::Node;
+template<typename T>
+class SubExpr : public mugrad::Node<T> {
+    using Node<T>::Node;
 
 public:
     void backward() override
@@ -54,9 +52,9 @@ public:
     }
 };
 
-template<>
-class MulExpr<double> : public mugrad::Node<double> {
-    using Node::Node;
+template<typename T>
+class MulExpr : public mugrad::Node<T> {
+    using Node<T>::Node;
 
 public:
     void backward() override
@@ -71,18 +69,18 @@ public:
     }
 };
 
-template<>
-class ExpExpr<double> : public mugrad::Node<double> {
-    using Node::Node;
+template<typename T>
+class ExpExpr : public mugrad::Node<T> {
+    using Node<T>::Node;
 
 public:
     ExpExpr() = delete;
-    ExpExpr(double, std::string) = delete;
-    ExpExpr(double, std::string, std::shared_ptr<Node<double>>, std::shared_ptr<Node<double>>) = delete;
+    ExpExpr(T, std::string) = delete;
+    ExpExpr(T, std::string, std::shared_ptr<Node<T>>, std::shared_ptr<Node<T>>) = delete;
 
-    explicit ExpExpr(double data, std::string label, std::shared_ptr<Node<double>> l,
-        std::shared_ptr<Node<double>> r, unsigned int N)
-        : Node(data, label, l, r)
+    explicit ExpExpr(T data, std::string label, std::shared_ptr<Node<T>> l,
+        std::shared_ptr<Node<T>> r, unsigned int N)
+        : Node<T>(data, label, l, r)
         , N_ { N }
     {
     }
@@ -104,6 +102,19 @@ auto backward(Node<T>* head) -> void
     auto topo = head->gen_topo();
 
     head->set_grad(1);
+
+    for (auto const& c : topo)
+        c->backward();
+}
+
+template<>
+auto backward(Node<Tensor>* head) -> void
+{
+    auto topo = head->gen_topo();
+    head->zero_grad();
+
+    std::cout << head->data.shape().first << std::endl;
+    head->set_grad(Tensor::ones(head->data.shape()));
 
     for (auto const& c : topo)
         c->backward();

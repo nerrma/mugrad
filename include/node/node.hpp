@@ -1,5 +1,6 @@
 #pragma once
 
+#include "tensor/tensor.hpp"
 #include <algorithm>
 #include <iostream>
 #include <memory>
@@ -24,6 +25,7 @@ public:
         , label_ {}
         , l_ {}
         , r_ {}
+        , grad_ { T {} }
     {
     }
 
@@ -32,6 +34,7 @@ public:
         , label_ { label }
         , l_ {}
         , r_ {}
+        , grad_ { T {} }
     {
     }
 
@@ -41,18 +44,24 @@ public:
         , label_ { label }
         , l_ { l }
         , r_ { r }
+        , grad_ { T {} }
     {
     }
 
-    double data;
+    T data;
 
     auto set_grad(T const& grad) -> void { grad_ = grad; }
-    [[nodiscard]] auto get_grad() const -> double { return grad_; }
+    [[nodiscard]] auto get_grad() const -> T { return grad_; }
     auto add_grad(T const& addend) -> void { this->grad_ += addend; }
     auto set_ptr(std::shared_ptr<Node<T>> const& ptr) -> void { this->ptr_ = ptr; }
     auto zero_grad() -> void
     {
-        this->grad_ = 0;
+        if constexpr (std::is_same_v<T, mugrad::Tensor>) {
+            this->grad_.fill(0);
+        } else {
+            this->grad_ = T {};
+        }
+
         if (l_ != nullptr)
             l_->zero_grad();
 
